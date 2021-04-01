@@ -21,13 +21,12 @@ function createElement(type, props, ...children) {
 }
 
 function render(element, container) {
-  const node = createDOMElement(element);
-  container.appendChild(node);
-}
+  let dom;
 
-function createDOMElement(element) {
   if (typeof element === 'string') {
-    return document.createTextNode(element);
+    dom = document.createTextNode(element);
+    container.appendChild(dom);
+    return;
   }
 
   const {
@@ -35,7 +34,7 @@ function createDOMElement(element) {
     props: { children, ...attrs },
   } = element;
 
-  const node = document.createElement(type);
+  dom = document.createElement(type);
 
   for (const attrName in attrs) {
     const attrValue = attrs[attrName];
@@ -44,19 +43,19 @@ function createDOMElement(element) {
     const isAnEvent = attrName.startsWith('on') && lowercasedAttrName in window;
     if (isAnEvent) {
       const event = lowercasedAttrName.slice(2);
-      node.addEventListener(event, attrValue);
+      dom.addEventListener(event, attrValue);
       continue;
     }
 
     const _attrName = attrName === 'className' ? 'class' : attrName;
-    node.setAttribute(_attrName, attrValue);
+    dom.setAttribute(_attrName, attrValue);
   }
 
   for (const child of children) {
-    node.appendChild(createDOMElement(child));
+    render(child, dom);
   }
 
-  return node;
+  container.appendChild(dom);
 }
 
 const MyReact = {
