@@ -52,6 +52,12 @@ function render(element, container) {
   }
 
   for (const child of children) {
+    // The problem with this recursive call is once we start rendering,
+    // we won't stop until we have rendered the entire element tree.
+    // If the element tree is big, it may block the main thread for
+    // too long. And if the browser needs to do high priority stuff
+    // like handling user input or keep an animation smooth, it will
+    // have to wait until the render finishes.
     render(child, dom);
   }
 
