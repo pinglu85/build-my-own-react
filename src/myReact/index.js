@@ -64,6 +64,34 @@ function render(element, container) {
   container.appendChild(dom);
 }
 
+// *** Concurrent Mode ***
+
+let nextUnitOfWork = null;
+
+// Idle callback handler. It gets called when the browser determines
+// there's enough idle time available to let us do some work.
+// The callback will receives a `deadline` parameter from `requestIdleCallback`,
+// which can be used to check how much time we have until the browser needs
+// to take control again.
+function workLoop(deadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    // Check is there's time left.
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+  // Schedule another idle callback.
+  requestIdleCallback(workLoop);
+}
+// `window.requestIdleCallback` queues a function to be called
+// when the main thread is idle.
+requestIdleCallback(workLoop);
+
+// Performs a unit of work and returns the next unit of work.
+function performUnitOfWork(nextUnitOfWork) {
+  // to do
+}
+
 const MyReact = {
   createElement,
   render,
