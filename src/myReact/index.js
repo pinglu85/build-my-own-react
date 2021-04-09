@@ -1,24 +1,4 @@
-function createElement(type, props, ...children) {
-  // Handle functional component.
-  // type = (props) => {
-  //   return MyReact.createElement(
-  //     'div',
-  //     { id: 'foo' },
-  //     MyReact.createElement('h1', null, 'Hello MyReact')
-  //   );
-  // };
-  if (typeof type === 'function') {
-    return type({ children, ...props });
-  }
-
-  return {
-    type,
-    props: {
-      ...props,
-      children,
-    },
-  };
-}
+import createElement from './createElement';
 
 // Creates a DOM node from fiber.
 function createDOM(fiber) {
