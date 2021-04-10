@@ -27,3 +27,5 @@ function createDOM(fiber) {
 
   return dom;
 }
+
+export default createDOM;
