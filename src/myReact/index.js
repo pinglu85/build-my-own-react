@@ -31,17 +31,23 @@ function createDOM(fiber) {
 }
 
 let nextUnitOfWork = null;
+let wipRoot = null;
+
+// Appends all the nodes to the DOM
+function commitRoot() {}
 
 // Creates the root of the fiber tree and
 // sets it as the next unit of work.
 function render(element, container) {
-  // Set next unit of work.
-  nextUnitOfWork = {
+  // Keep track of the work-in-progress root of the fiber tree.
+  wipRoot = {
     dom: container,
     props: {
       children: [element],
     },
   };
+  // Set next unit of work.
+  nextUnitOfWork = wipRoot;
 }
 
 // *** Concurrent Mode ***
@@ -58,6 +64,14 @@ function workLoop(deadline) {
     // Check is there's time left.
     shouldYield = deadline.timeRemaining() < 1;
   }
+
+  // Commit the whole fiber tree to the DOM,
+  // if there is no next unit of work and
+  // the work-in-progress root exists.
+  if (!nextUnitOfWork && wipRoot) {
+    commitRoot();
+  }
+
   // Schedule another idle callback.
   requestIdleCallback(workLoop);
 }
@@ -81,10 +95,12 @@ function performUnitOfWork(fiber) {
   if (!fiber.dom) fiber.dom = createDOM(fiber);
 
   // Append the DOM node to its parent DOM node, if the fiber
-  // has parent.
-  if (fiber.parent) {
-    fiber.parent.dom.appendChild(fiber.dom);
-  }
+  // has parent. However, if we append the child node to the
+  // DOM now, the user might see an incomplete UI, since the
+  // browser can interrupt our rendering.
+  // if (fiber.parent) {
+  //   fiber.parent.dom.appendChild(fiber.dom);
+  // }
 
   /* Create new fibers from the node's children. */
 
