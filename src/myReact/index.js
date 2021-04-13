@@ -4,8 +4,22 @@ import createDOM from './createDOM';
 let nextUnitOfWork = null;
 let wipRoot = null;
 
-// Appends all the nodes to the DOM
-function commitRoot() {}
+// Traverses the fiber tree and appends all nodes
+// to the DOM.
+function commitRoot() {
+  commitWork(wipRoot.child);
+  wipRoot = null;
+}
+
+function commitWork(fiber) {
+  if (!fiber) return;
+
+  const domParent = fiber.parent.dom;
+  domParent.appendChild(fiber.dom);
+
+  commitWork(fiber.child);
+  commitWork(fiber.sibling);
+}
 
 // Creates the root of the fiber tree and
 // sets it as the next unit of work.
