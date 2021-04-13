@@ -2,6 +2,8 @@ import createElement from './createElement';
 import createDOM from './createDOM';
 
 let nextUnitOfWork = null;
+// wipRoot keeps track of the work-in-progress root of
+// the fiber tree.
 let wipRoot = null;
 
 // Traverses the fiber tree and appends all nodes
@@ -24,7 +26,6 @@ function commitWork(fiber) {
 // Creates the root of the fiber tree and
 // sets it as the next unit of work.
 function render(element, container) {
-  // Keep track of the work-in-progress root of the fiber tree.
   wipRoot = {
     dom: container,
     props: {
